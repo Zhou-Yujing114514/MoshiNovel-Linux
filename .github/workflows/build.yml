@@ -22,7 +22,7 @@ jobs:
       - name: Install Linux deps
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ninja-build libgtk-3-dev liblzma-dev
+          sudo apt-get install -y -qq ninja-build libgtk-3-dev liblzma-dev libsecret-1-dev
 
       - name: Get dependencies
         run: flutter pub get
