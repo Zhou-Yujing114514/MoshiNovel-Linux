@@ -1,0 +1,8 @@
+Package: moshi-novel
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: 四生万物工作室 <qgs.kdns.fr>
+Description: 摩柿小说下载站 Linux 客户端（Flutter）
+Installed-Size: 131072
