@@ -1,0 +1,65 @@
+name: Build Linux
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Linux deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ninja-build libgtk-3-dev liblzma-dev
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Linux release
+        run: flutter build linux --release
+
+      - name: Package tar.gz
+        run: |
+          cd build/linux/x64/release/bundle
+          tar czf ../../../../MoshiNovel-Linux.tar.gz .
+          cd ../../../../
+
+      - name: Package deb
+        run: |
+          set -e
+          mkdir -p pkg/DEBIAN pkg/usr/bin pkg/opt/moshi_novel
+          cp -r build/linux/x64/release/bundle/* pkg/opt/moshi_novel/
+          chmod -R a+rX pkg/opt/moshi_novel
+          ln -sf /opt/moshi_novel/moshi_novel pkg/usr/bin/moshi_novel
+          cat > pkg/DEBIAN/control <<'CTRL'
+Package: moshi-novel
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: 四生万物工作室 <qgs.kdns.fr>
+Description: 摩柿小说下载站 Linux 客户端（Flutter）
+Installed-Size: 131072
+CTRL
+          dpkg-deb --build pkg moshi_novel_amd64.deb
+          ls -lh moshi_novel_amd64.deb
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            MoshiNovel-Linux.tar.gz
+            moshi_novel_amd64.deb
