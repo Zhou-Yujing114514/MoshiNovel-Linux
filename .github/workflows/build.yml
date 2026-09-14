@@ -18,11 +18,13 @@ jobs:
           - arch: amd64
             target: x64
             runner: ubuntu-latest
+            flutter_arch: x64
             sfx: ""
             deb_name: moshi_novel_amd64.deb
           - arch: arm64
             target: arm64
             runner: ubuntu-24.04-arm
+            flutter_arch: arm64
             sfx: "-arm64"
             deb_name: moshi_novel_arm64.deb
     runs-on: ${{ matrix.runner }}
@@ -32,6 +34,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          architecture: ${{ matrix.flutter_arch }}
           cache: true
 
       - name: Install Linux deps
